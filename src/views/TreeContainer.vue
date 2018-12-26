@@ -44,6 +44,18 @@ let globalMemoryEx = 0;
 let globalMemoryEy = 0;
 let curSceneAnimation = null;
 
+function getTop(e) {
+  var offset = e.offsetTop;
+  if (e.offsetParent != null) offset += getTop(e.offsetParent);
+  return offset;
+}
+
+function getLeft(e) {
+  var offset = e.offsetLeft;
+  if (e.offsetParent != null) offset += getLeft(e.offsetParent);
+  return offset;
+}
+
 export default {
   data() {
     return {
@@ -657,8 +669,14 @@ export default {
           const xy = v.project(this.camera);
           //console.log(xy)
           let finalXY = {
-            x: ((xy.x + 1) * width) / 2,
-            y: ((1 - xy.y) * height) / 2
+            x:
+              ((xy.x + 1) * width) / 2 +
+              getLeft(container) +
+              $(document).scrollLeft(),
+            y:
+              ((1 - xy.y) * height) / 2 +
+              getTop(container) +
+              $(document).scrollTop()
           };
           //console.log(finalXY)
           var dis = Math.pow(
