@@ -1,13 +1,13 @@
 <template>
-  <div>
+  <div class="outer-bg">
     <div
       id="graphContainer"
       class="process-tree-container"
     />
     <div class="control-wrapper">
       <button
-        @click="setCameraPosition1"
         style="margin-right:20px"
+        @click="setCameraPosition1"
       >俯瞰图</button>
       <button @click="setCameraPosition2">平视图</button>
     </div>
@@ -51,7 +51,7 @@ export default {
       camera: null,
       scene: null,
       mesh: null,
-      miserables: tree,
+      miserables: {},
       nodesArr: []
     };
   },
@@ -66,9 +66,15 @@ export default {
   },
   // destroyed() {},
   methods: {
+    async initData() {
+      await (this.miserables = tree);
+    },
     async init() {
-      // this.pushIntoNodesArr(miserables)
-      console.log("miserables", this.miserables);
+      await this.initData();
+      await this.nodesArr.push(this.miserables);
+      await this.pushIntoNodesArr(this.miserables);
+      // console.log(this.miserables)
+      // console.log("miserables", this.miserables);
       await this.initMesh();
       await this.createBackground();
       this.miserables.x = 0;
@@ -130,7 +136,7 @@ export default {
       this.camera.nextZoom = this.camera.zoom = 1;
       this.renderer = new THREE.WebGLRenderer({
         antialias: true,
-        precision: "highp",
+        precision: "lowp",
         alpha: true
       });
       this.renderer.setSize(width, height);
@@ -152,7 +158,7 @@ export default {
 
     createBackground() {
       this.material = new THREE.MeshPhongMaterial({
-        color: "rgb(44, 56, 85)",
+        color: "#2C3855",
         dithering: false
       });
       this.geometry = new THREE.PlaneBufferGeometry(2000, 2000);
@@ -225,8 +231,8 @@ export default {
       let circleMaterial = new THREE.SpriteMaterial({
         map: this.particleGraphic,
         alphaTest: 0.1,
-        color: "",
-        transparent: false,
+        color: "#fff",
+        transparent: true,
         opacity: 1,
         depthTest: false
       });
@@ -345,8 +351,8 @@ export default {
     createLink(source, target) {
       let linkMaterial = new THREE.LineBasicMaterial({
         color: "rgb(78, 97, 152)",
-        transparent: true,
-        opacity: 1,
+        transparent: false,
+        opacity: 0.1,
         alphaTest: 0.1,
         depthTest: false
       });
@@ -485,7 +491,8 @@ export default {
 
       if (globalEx != 0 && globalEx != globalMemoryEx && globalMemoryEx != 0) {
         var diffX = globalEx - globalMemoryEx;
-        //  console.log(diffX)
+        // console.log(diffX)
+        // console.log(this.nodesArr)
         this.nodesArr.forEach(node => {
           node.x +=
             (diffX / 10 / this.camera.zoom) *
@@ -549,7 +556,7 @@ export default {
           //node.icons[i].position.set(Math.cos(camera.rotation.y) * (i * 0.15 - 0.5), 0.5, -Math.sin(camera.rotation.y) * (i * 0.15 - 0.5));
           node.icons[i].css({
             left: finalXY.x + (-16 + 6 * i) * this.camera.zoom,
-            top: finalXY.y + -16 * this.camera.zoom,
+            top: finalXY.y + -11 * this.camera.zoom,
             transform: "scale(" + this.camera.zoom / 3 + ")"
           });
         }
@@ -634,12 +641,13 @@ export default {
       //  i--;
       //}
       pointLights[0].intensity = 0;
-      var distance = 20;
+      var distance = 25 * this.camera.zoom;
       var nearestNode = null;
       if (event.buttons == 1) {
         this.nodesArr.forEach((node, index) => {
           const { x, y, z, aura, circle, textGragh } = node;
           circle.position.set(x, y, z);
+          node.circle.material.opacity = 1;
           node.aura.material.opacity = 0;
           const v = new THREE.Vector3(
             node.circle.position.x,
@@ -666,8 +674,11 @@ export default {
         if (nearestNode) {
           mousedownOnNode = true;
           // console.log(nearestNode)
+          nearestNode.circle.material.opacity = 0;
           nearestNode.aura.material.opacity = 1;
           globalControlNode = nearestNode;
+
+          console.log("点击了一个节点", nearestNode);
 
           pointLights[0].obj = globalControlNode;
           pointLights[0].intensity = 1.4;
@@ -731,17 +742,24 @@ export default {
 </script>
 
 <style scoped>
-.process-tree-container {
+/* 树布局相关 */
+.outer-bg {
   background-color: #2C3855;
   height: 740px;
   position: relative;
-  width: 80%;
+  width: 100%;
   overflow: hidden;
+}
+.process-tree-container {
+  background-color: #2C3855;
+  width: 100%;
+  height: 100%;
 }
 
 .control-wrapper {
   position: absolute;
-  right: 100px;
-  top: 50px;
+  right: 20px;
+  top: 20px;
 }
+
 </style>
