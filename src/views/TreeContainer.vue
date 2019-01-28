@@ -45,15 +45,15 @@ let globalMemoryEy = 0;
 let curSceneAnimation = null;
 
 function getTop(e) {
-  var offset = e.offsetTop;
-  if (e.offsetParent != null) offset += getTop(e.offsetParent);
-  return offset;
+  var offsetTop = e.offsetTop;
+  if (e.offsetParent != null) offsetTop += getTop(e.offsetParent);
+  return offsetTop;
 }
 
 function getLeft(e) {
-  var offset = e.offsetLeft;
-  if (e.offsetParent != null) offset += getLeft(e.offsetParent);
-  return offset;
+  var offsetLeft = e.offsetLeft;
+  if (e.offsetParent != null) offsetLeft += getLeft(e.offsetParent);
+  return offsetLeft;
 }
 
 export default {
@@ -734,6 +734,7 @@ export default {
       }
 
       this.camera.nextZoom = globalScale;
+      e.preventDefault();
     },
 
     mousemove(event) {

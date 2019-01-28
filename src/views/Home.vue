@@ -1,19 +1,17 @@
 <template>
   <div class="home-container">
     <header>header</header>
-    <div class="main">
-      <i-row>
-        <i-col span="8">
-          <div class="detail-info" />
-        </i-col>
-        <i-col span="16">
-          <TreeContainer />
-        </i-col>
-        <i-col span="24">
-          <div class="other-module" />
-        </i-col>
-      </i-row>
-    </div>
+    <i-row class="main">
+      <i-col span="8">
+        <div class="detail-info" />
+      </i-col>
+      <i-col span="16">
+        <TreeContainer />
+      </i-col>
+      <i-col span="24">
+        <div class="other-module" />
+      </i-col>
+    </i-row>
   </div>
 </template>
 
