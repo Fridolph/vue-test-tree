@@ -4,19 +4,35 @@
       id="graphContainer"
       class="process-tree-container"
     />
-    <div class="control-wrapper">
-      <button
-        style="margin-right:20px"
+    <div class="control-wrapper g-1">
+      <div
+        class="control-item icons-3d"
         @click="setCameraPosition1"
-      >俯瞰图</button>
-      <button @click="setCameraPosition2">平视图</button>
+      >3D</div>
+      <div
+        class="control-item icons-2d"
+        @click="setCameraPosition2"
+      >2D</div>
+    </div>
+    <div class="control-wrapper g-2">
+      <div
+        class="control-item icons-add"
+        @click="addCameraZoom"
+      >+</div>
+      <div
+        class="control-item icons-fit"
+        @click="setCameraZoom"
+      >#</div>
+      <div
+        class="control-item icons-reduce"
+        @click="reduceCameraZoom"
+      >-</div>
     </div>
   </div>
 </template>
 
 <script>
-// import { processTree } from "@/api/mergeDetail";
-import tree from "./testTree";
+import tree from "./testTree2";
 // import { mapState } from "vuex";
 import * as THREE from "three";
 import $ from "jquery";
@@ -45,18 +61,19 @@ let globalMemoryEy = 0;
 let curSceneAnimation = null;
 
 function getTop(e) {
-  var offsetTop = e.offsetTop;
-  if (e.offsetParent != null) offsetTop += getTop(e.offsetParent);
-  return offsetTop;
+  var offset = e.offsetTop;
+  if (e.offsetParent != null) offset += getTop(e.offsetParent);
+  return offset;
 }
 
 function getLeft(e) {
-  var offsetLeft = e.offsetLeft;
-  if (e.offsetParent != null) offsetLeft += getLeft(e.offsetParent);
-  return offsetLeft;
+  var offset = e.offsetLeft;
+  if (e.offsetParent != null) offset += getLeft(e.offsetParent);
+  return offset;
 }
 
 export default {
+  name: "tree-container",
   data() {
     return {
       renderer: null,
@@ -75,6 +92,10 @@ export default {
     setTimeout(() => {
       this.init();
     }, 200);
+
+    setTimeout(() => {
+      this.setCameraZoom();
+    }, 500);
   },
   // destroyed() {},
   methods: {
@@ -99,8 +120,8 @@ export default {
       await this.animate();
 
       const canvas = document.querySelector("canvas");
-      canvas.addEventListener("mousewheel", this.mousewheel, false);
-      canvas.addEventListener("DOMMouseScroll", this.mousewheel, false);
+      // canvas.addEventListener("mousewheel", this.mousewheel, false);
+      // canvas.addEventListener("DOMMouseScroll", this.mousewheel, false);
       canvas.addEventListener("mousedown", this.mousedown, false);
       canvas.addEventListener("mouseup", this.mouseup, false);
       canvas.addEventListener("mousemove", this.mousemove, false);
@@ -115,14 +136,6 @@ export default {
         }
       };
       window.requestAnimationFrame(animationFrames["s" + len]);
-    },
-
-    setCameraPosition1() {
-      this.camera.position.set(-1400, 1900, 2400);
-    },
-
-    setCameraPosition2() {
-      this.camera.position.set(-2705.9752444222386, 4754, 11.574825009807226);
     },
 
     pushIntoNodesArr(obj) {
@@ -249,9 +262,12 @@ export default {
         depthTest: false
       });
 
-      if (Math.random() > 0.5) {
+      if (node.threat) {
         circleMaterial.map = this.particleGraphic2;
         auraMaterial.map = this.auraGraphic2;
+      } else {
+        circleMaterial.map = this.particleGraphic;
+        auraMaterial.map = this.auraGraphic;
       }
 
       node.aura = new THREE.Sprite(auraMaterial);
@@ -269,51 +285,51 @@ export default {
       node.circle.add(node.aura);
       node.icons = [];
       //添加小图标
-      if (Math.random() > 0.5) {
-        // var iconMaterial = new THREE.SpriteMaterial({map:correspondGraph, alphaTest :0.1 ,transparent: false, opacity:1,depthTest: false});
-        // var icon = new THREE.Sprite(iconMaterial);
-        icon = $(
-          '<img style="position:absolute;z-index:1000;" src="/img/correspond.png"></img>'
-        );
-        $(container).append(icon);
-        node.icons.push(icon);
-      }
-      if (Math.random() > 0.5) {
-        // var iconMaterial = new THREE.SpriteMaterial({map:fileGraph, alphaTest :0.1 ,transparent: false, opacity:1,depthTest: false});
-        // var icon = new THREE.Sprite(iconMaterial);
-        icon = $(
-          '<img style="position:absolute;z-index:1000;" src="/img/file.png"></img>'
-        );
-        $(container).append(icon);
-        node.icons.push(icon);
-      }
-      if (Math.random() > 0.5) {
-        // var iconMaterial = new THREE.SpriteMaterial({map:injectionGraph, alphaTest :0.1 ,transparent: false, opacity:1,depthTest: false});
-        // var icon = new THREE.Sprite(iconMaterial);
-        icon = $(
-          '<img style="position:absolute;z-index:1000;" src="/img/injection.png"></img>'
-        );
-        $(container).append(icon);
-        node.icons.push(icon);
-      }
-      if (Math.random() > 0.5) {
-        // var iconMaterial = new THREE.SpriteMaterial({map:loadGraph, alphaTest :0.1 ,transparent: false, opacity:1,depthTest: false});
-        // var icon = new THREE.Sprite(iconMaterial);
-        icon = $(
-          '<img style="position:absolute;z-index:1000;" src="/img/load.png"></img>'
-        );
-        $(container).append(icon);
-        node.icons.push(icon);
-      }
-      if (Math.random() > 0.5) {
-        // var iconMaterial = new THREE.SpriteMaterial({map:regeditGraph, alphaTest :0.1 ,transparent: false, opacity:1,depthTest: false});
-        // var icon = new THREE.Sprite(iconMaterial);
-        icon = $(
-          '<img style="position:absolute;z-index:1000;" src="/img/regedit.png"></img>'
-        );
-        $(container).append(icon);
-        node.icons.push(icon);
-      }
+      // if (Math.random() > 0.5) {
+      //   // var iconMaterial = new THREE.SpriteMaterial({map:correspondGraph, alphaTest :0.1 ,transparent: false, opacity:1,depthTest: false});
+      //   // var icon = new THREE.Sprite(iconMaterial);
+      //   icon = $(
+      //     '<img style="position:absolute;z-index:1000;" src="/img/correspond.png"></img>'
+      //   );
+      //   $(container).append(icon);
+      //   node.icons.push(icon);
+      // }
+      // if (Math.random() > 0.5) {
+      //   // var iconMaterial = new THREE.SpriteMaterial({map:fileGraph, alphaTest :0.1 ,transparent: false, opacity:1,depthTest: false});
+      //   // var icon = new THREE.Sprite(iconMaterial);
+      //   icon = $(
+      //     '<img style="position:absolute;z-index:1000;" src="/img/file.png"></img>'
+      //   );
+      //   $(container).append(icon);
+      //   node.icons.push(icon);
+      // }
+      // if (Math.random() > 0.5) {
+      //   // var iconMaterial = new THREE.SpriteMaterial({map:injectionGraph, alphaTest :0.1 ,transparent: false, opacity:1,depthTest: false});
+      //   // var icon = new THREE.Sprite(iconMaterial);
+      //   icon = $(
+      //     '<img style="position:absolute;z-index:1000;" src="/img/injection.png"></img>'
+      //   );
+      //   $(container).append(icon);
+      //   node.icons.push(icon);
+      // }
+      // if (Math.random() > 0.5) {
+      //   // var iconMaterial = new THREE.SpriteMaterial({map:loadGraph, alphaTest :0.1 ,transparent: false, opacity:1,depthTest: false});
+      //   // var icon = new THREE.Sprite(iconMaterial);
+      //   icon = $(
+      //     '<img style="position:absolute;z-index:1000;" src="/img/load.png"></img>'
+      //   );
+      //   $(container).append(icon);
+      //   node.icons.push(icon);
+      // }
+      // if (Math.random() > 0.5) {
+      //   // var iconMaterial = new THREE.SpriteMaterial({map:regeditGraph, alphaTest :0.1 ,transparent: false, opacity:1,depthTest: false});
+      //   // var icon = new THREE.Sprite(iconMaterial);
+      //   icon = $(
+      //     '<img style="position:absolute;z-index:1000;" src="/img/regedit.png"></img>'
+      //   );
+      //   $(container).append(icon);
+      //   node.icons.push(icon);
+      // }
 
       this.createNodeText(node);
       node.circle.position.set(node.x, node.y, node.z);
@@ -516,6 +532,7 @@ export default {
             Math.cos(angle);
         });
       }
+
       if (globalEy != 0 && globalEy != globalMemoryEy && globalMemoryEy != 0) {
         var diffY = globalEy - globalMemoryEy;
         this.nodesArr.forEach(node => {
@@ -548,6 +565,7 @@ export default {
         }
         this.camera.updateProjectionMatrix();
       }
+
       this.nodesArr.forEach((node, index) => {
         const { x, y, z, aura, circle, textGragh } = node;
         circle.position.set(x, y, z);
@@ -562,70 +580,64 @@ export default {
           x: ((xy.x + 1) * width) / 2,
           y: ((1 - xy.y) * height) / 2
         };
-
-        for (var i = 0; i < node.icons.length; i++) {
-          //  node.icons[i].position.set(Math.cos(camera.rotation.y) * (i * 0.15 - 0.5), 0.5, -Math.sin(camera.rotation.y) * (i * 0.15 - 0.5));
-          //node.icons[i].position.set(Math.cos(camera.rotation.y) * (i * 0.15 - 0.5), 0.5, -Math.sin(camera.rotation.y) * (i * 0.15 - 0.5));
-          node.icons[i].css({
-            left: finalXY.x + (-16 + 6 * i) * this.camera.zoom,
-            top: finalXY.y + -11 * this.camera.zoom,
-            transform: "scale(" + this.camera.zoom / 3 + ")"
-          });
-        }
       });
 
-      var link = links[0];
-      var v1 = new THREE.Vector3(link.source.x, link.source.y, link.source.z);
-      var xy1 = v1.project(this.camera);
-      var finalXY1 = {
-        x: ((xy1.x + 1) * width) / 2,
-        y: ((1 - xy1.y) * height) / 2
-      };
+      if (links.length > 0) {
+        var link = links[0];
+        var v1 = new THREE.Vector3(link.source.x, link.source.y, link.source.z);
+        var xy1 = v1.project(this.camera);
+        var finalXY1 = {
+          x: ((xy1.x + 1) * width) / 2,
+          y: ((1 - xy1.y) * height) / 2
+        };
 
-      var v2 = new THREE.Vector3(
-        link.source.x,
-        (link.source.y + link.target.y) / 2,
-        (link.source.z + link.target.z) / 2
-      );
-      var xy2 = v2.project(this.camera);
-      var finalXY2 = {
-        x: ((xy2.x + 1) * width) / 2,
-        y: ((1 - xy2.y) * height) / 2
-      };
-
-      var slope = (finalXY2.y - finalXY1.y) / (finalXY2.x - finalXY1.x);
-
-      links.forEach(link => {
-        link.line.geometry.verticesNeedUpdate = true;
-        link.line.geometry.vertices[0] = new THREE.Vector3(
-          link.source.x,
-          link.source.y,
-          link.source.z
-        );
-        link.line.geometry.vertices[1] = new THREE.Vector3(
+        var v2 = new THREE.Vector3(
           link.source.x,
           (link.source.y + link.target.y) / 2,
           (link.source.z + link.target.z) / 2
         );
-        link.line.geometry.vertices[2] = new THREE.Vector3(
-          link.target.x,
-          (link.source.y + link.target.y) / 2,
-          (link.source.z + link.target.z) / 2
-        );
-        link.line.geometry.vertices[3] = new THREE.Vector3(
-          link.target.x,
-          link.target.y,
-          link.target.z
-        );
-        link.line.geometry.computeBoundingSphere();
-        link.textGragh.position.set(
-          link.target.x,
-          link.target.y,
-          link.target.z - minDistance / 3
-        );
-        link.textGragh.material.rotation = -Math.atan(slope);
-      });
 
+        var xy2 = v2.project(this.camera);
+
+        var finalXY2 = {
+          x: ((xy2.x + 1) * width) / 2,
+          y: ((1 - xy2.y) * height) / 2
+        };
+
+        var slope = (finalXY2.y - finalXY1.y) / (finalXY2.x - finalXY1.x);
+
+        links.forEach(link => {
+          link.line.geometry.verticesNeedUpdate = true;
+          link.line.geometry.vertices[0] = new THREE.Vector3(
+            link.source.x,
+            link.source.y,
+            link.source.z
+          );
+          link.line.geometry.vertices[1] = new THREE.Vector3(
+            link.source.x,
+            (link.source.y + link.target.y) / 2,
+            (link.source.z + link.target.z) / 2
+          );
+          link.line.geometry.vertices[2] = new THREE.Vector3(
+            link.target.x,
+            (link.source.y + link.target.y) / 2,
+            (link.source.z + link.target.z) / 2
+          );
+          link.line.geometry.vertices[3] = new THREE.Vector3(
+            link.target.x,
+            link.target.y,
+            link.target.z
+          );
+
+          link.line.geometry.computeBoundingSphere();
+          link.textGragh.position.set(
+            link.target.x,
+            link.target.y,
+            link.target.z - minDistance / 3
+          );
+          link.textGragh.material.rotation = -Math.atan(slope);
+        });
+      }
       this.camera.lookAt(this.scene.position);
       this.renderer.render(this.scene, this.camera);
     },
@@ -671,12 +683,12 @@ export default {
           let finalXY = {
             x:
               ((xy.x + 1) * width) / 2 +
-              getLeft(container) +
-              $(document).scrollLeft(),
+              getLeft(container) -
+              document.documentElement.scrollLeft,
             y:
               ((1 - xy.y) * height) / 2 +
-              getTop(container) +
-              $(document).scrollTop()
+              getTop(container) -
+              document.documentElement.scrollTop
           };
           //console.log(finalXY)
           var dis = Math.pow(
@@ -695,11 +707,9 @@ export default {
           nearestNode.circle.material.opacity = 0;
           nearestNode.aura.material.opacity = 1;
           globalControlNode = nearestNode;
-
-          console.log("点击了一个节点", nearestNode);
-
+          // console.log("点击了一个节点", nearestNode);
           pointLights[0].obj = globalControlNode;
-          pointLights[0].intensity = 1.4;
+          // pointLights[0].intensity = 1.4;
         }
 
         if (!mousedownOnNode) {
@@ -734,7 +744,6 @@ export default {
       }
 
       this.camera.nextZoom = globalScale;
-      e.preventDefault();
     },
 
     mousemove(event) {
@@ -755,12 +764,44 @@ export default {
         globalEx = event.clientX;
         globalEy = event.clientY;
       }
+    },
+
+    setCameraPosition1() {
+      this.camera.position.set(-1400, 1900, 2400);
+    },
+
+    setCameraPosition2() {
+      this.camera.position.set(-2705.9752444222386, 4754, 11.574825009807226);
+    },
+
+    setCameraZoom() {
+      this.camera.nextZoom = 4.5;
+    },
+
+    addCameraZoom() {
+      let z = this.camera.nextZoom;
+      if (z <= 8) {
+        this.camera.nextZoom += 1;
+      } else {
+        this.$Message.warning(this.$t("mergeDetail.tree.maxWarn"));
+      }
+    },
+
+    reduceCameraZoom() {
+      let z = this.camera.nextZoom;
+      if (z > 2) {
+        this.camera.nextZoom -= 0.4;
+      } else if (z >= 1 && z <= 2) {
+        this.camera.nextZoom -= 0.2;
+      } else if (z < 1) {
+        this.$Message.warning(this.$t("mergeDetail.tree.maxWarn"));
+      }
     }
   }
 };
 </script>
 
-<style scoped>
+<style scoped lang="stylus">
 /* 树布局相关 */
 .outer-bg {
   background-color: #2C3855;
@@ -770,6 +811,7 @@ export default {
   overflow: hidden;
 }
 .process-tree-container {
+  position: relative;
   background-color: #2C3855;
   width: 100%;
   height: 100%;
@@ -781,4 +823,48 @@ export default {
   top: 20px;
 }
 
+.control-wrapper
+  position: absolute;
+  z-index: 101;
+  display: flex;
+  &.g-1
+    left: 30px
+    top: 90px
+  &.g-2
+    left: 105px
+    top: 90px
+
+  .control-item
+    cursor pointer
+    display flex
+    justify-content center
+    align-items center
+    width 24px
+    height 24px
+    border 1px solid #485c80
+    text-align center
+    color #fff
+
+    &.icons-add
+      bg('/img/add.svg')
+      background-size 15px 15px
+      border-right 0
+      border-radius 2px 0 0 2px
+    &.icons-reduce
+      bg('/img/reduce.svg')
+      background-size 16px 16px
+      border-radius 0 2px 2px 0
+    &.icons-fit
+      bg('/img/fit.svg')
+      background-size 15px 15px
+      border-right 0
+    &.icons-3d
+      border-radius 2px 0 0 2px
+      border-right 0
+      bg('/img/3d.svg')
+      background-size 15px 15px
+    &.icons-2d
+      border-radius 0 2px 2px 0
+      bg('/img/2d.svg')
+      background-size 15px 15px
 </style>

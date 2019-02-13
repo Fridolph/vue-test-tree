@@ -1,7 +1,7 @@
 <template>
   <div class="home-container">
     <header>header</header>
-    <i-row class="main">
+    <Row class="main">
       <i-col span="8">
         <div class="detail-info" />
       </i-col>
@@ -11,12 +11,11 @@
       <i-col span="24">
         <div class="other-module" />
       </i-col>
-    </i-row>
+    </Row>
   </div>
 </template>
 
 <script>
-import iview from "iview";
 import TreeContainer from "./TreeContainer";
 
 export default {
